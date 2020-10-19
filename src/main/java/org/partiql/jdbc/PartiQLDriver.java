@@ -55,5 +55,4 @@ public class PartiQLDriver implements Driver {
         return new PartiQLConnection(url);
     }
 
-
 }

@@ -1,18 +1,22 @@
+package org.partiql.jdbc;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.partiql.jdbc.PartiQLStatement;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Logger;
 
 public class SelectTest {
     private Connection connection;
+    final private Logger logger = Logger.getLogger("org.partiql.jdbc");
 
     @Before
     public void setup() throws SQLException {
-        // enforce the Driver to be registered/loaded before we do anything
+        // enforce the JDBC driver to be registered before we do anything
         try {
             Class.forName("org.partiql.jdbc.PartiQLDriver");
         } catch (ClassNotFoundException e) {
@@ -37,6 +41,24 @@ public class SelectTest {
                 "       e.title AS title\n" +
                 "FROM hr.employees e\n" +
                 "WHERE e.title = 'Dev Mgr'\n";
-        statement.execute(query);
+        ResultSet results = statement.executeQuery(query);
+        while (results.next()) {
+
+        }
+    }
+
+    @Test
+    public void testQ2() throws Exception {
+        PartiQLStatement statement = (PartiQLStatement) connection.createStatement();
+        String query = "SELECT e.name AS employeeName, \n" +
+                "       p.name AS projectName\n" +
+                "FROM hr.employeesNest AS e, \n" +
+                "     e.projects AS p\n" +
+                "WHERE p.name LIKE '%security%'";
+        ResultSet results = statement.executeQuery(query);
+        while (results.next()) {
+
+        }
+
     }
 }

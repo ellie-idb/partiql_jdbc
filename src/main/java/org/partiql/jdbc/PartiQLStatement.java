@@ -4,7 +4,6 @@ import org.partiql.lang.CompilerPipeline;
 import org.partiql.lang.eval.EvaluationSession;
 import org.partiql.lang.eval.ExprValue;
 import org.partiql.lang.eval.Expression;
-import org.partiql.lang.util.ConfigurableExprValueFormatter;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -17,17 +16,32 @@ public class PartiQLStatement extends AbstractStatement {
     private CompilerPipeline pipeline;
     private EvaluationSession session;
     private PartiQLGlobalBindings bindings;
+    private PartiQLResultSet results;
 
+    /**
+     * Create a statement given a PartiQL connection,
+     * and the global environment loaded.
+     *
+     * @param connection The PartiQL connection to use
+     * @param bindings The global environment which every query will refer to
+     */
     protected PartiQLStatement(PartiQLConnection connection, PartiQLGlobalBindings bindings) {
         this.connection = connection;
-        this.pipeline = CompilerPipeline.standard(connection.ion);
+        this.pipeline = CompilerPipeline.standard(this.connection.ion);
         this.bindings = bindings;
-        this.session = EvaluationSession.builder().globals(bindings.asExprValue().getBindings()).build();
+        this.session = EvaluationSession.builder().globals(this.bindings.asExprValue().getBindings()).build();
     }
 
+    /**
+     * @param s SQL query to run
+     * @return The ResultSet representing the BAG returned by the query
+     * @throws SQLException
+     */
     @Override
     public ResultSet executeQuery(String s) throws SQLException {
-        return null;
+        Expression expr = this.pipeline.compile(s);
+        ExprValue val = expr.eval(session);
+        return new PartiQLResultSet(this, val);
     }
 
     @Override
@@ -37,25 +51,18 @@ public class PartiQLStatement extends AbstractStatement {
 
     @Override
     public boolean execute(String s) throws SQLException {
-        Expression e = pipeline.compile(s);
-        ExprValue val = e.eval(session);
-        logger.info(ConfigurableExprValueFormatter.getPretty().format(val));
-        return false;
+        this.results = (PartiQLResultSet) executeQuery(s);
+        return true;
     }
 
     @Override
     public ResultSet getResultSet() throws SQLException {
-        return null;
+        return results;
     }
 
     @Override
     public Connection getConnection() throws SQLException {
         return this.connection;
-    }
-
-    @Override
-    public int getResultSetHoldability() throws SQLException {
-        return 0;
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-// translated from Kotlin back to idiomatic Java
+/* TODO: There has to be a better way to do this */
 public class PartiQLGlobalBindings {
     private ArrayList<String> knownNames;
     private Bindings<ExprValue> bindings;
@@ -30,7 +30,9 @@ public class PartiQLGlobalBindings {
     }
 
     ExprValue asExprValue() {
-        Stream<ExprValue> values = knownNames.stream().map( value -> bindings.get(new BindingName(value, BindingCase.SENSITIVE))).filter(Objects::nonNull);
+        Stream<ExprValue> values = knownNames.stream()
+                                             .map(value -> bindings.get(new BindingName(value, BindingCase.SENSITIVE)))
+                                             .filter(Objects::nonNull);
         return valueFactory.newStruct(values.collect(Collectors.toList()), StructOrdering.ORDERED);
     }
 }

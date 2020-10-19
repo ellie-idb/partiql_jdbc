@@ -7,6 +7,10 @@ import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
 
+/*
+    None of these are implemented,
+*/
+
 public class AbstractPreparedStatement implements java.sql.PreparedStatement {
     @Override
     public ResultSet executeQuery() throws SQLException {
