@@ -1,6 +1,7 @@
 package org.partiql.jdbc;
 
 import org.partiql.lang.eval.ExprValue;
+import org.partiql.lang.util.ConfigurableExprValueFormatter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,6 +32,11 @@ public class PartiQLResultSet extends AbstractResultSet {
         this.iterator = root.iterator();
         this.current = value;
         logger.info(value.getType().name());
+    }
+
+    @Override
+    public String toString() {
+        return ConfigurableExprValueFormatter.getPretty().format(this.root);
     }
 
     @Override

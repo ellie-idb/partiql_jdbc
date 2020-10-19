@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.logging.Logger;
 
@@ -22,40 +23,39 @@ public class PartiQLConnection extends AbstractConnection {
     final private ExprValueFactory valueFactory;
     final private CompilerPipeline pipeline;
     final private PartiQLGlobalBindings bindings;
+
     /***
+     *  Create a new PartiQL connection given an initial environment file to work on.
      *
-     * @param path
+     * @param path The file to load for initial ingest (as long as it is valid Ion data)
      */
-    protected PartiQLConnection(String path) {
-        ion = IonSystemBuilder.standard().build();
-        pipeline = CompilerPipeline.standard(ion);
-        valueFactory = ExprValueFactory.standard(ion);
+    protected PartiQLConnection(String path) throws SQLException {
+        this.ion = IonSystemBuilder.standard().build();
+        this.pipeline = CompilerPipeline.standard(ion);
+        this.valueFactory = ExprValueFactory.standard(ion);
         String actualPath = path.substring(path.lastIndexOf(":") + 1);
-        String envFile;
         try {
-            envFile = Files.readString(Path.of(actualPath));
+            String envFile = Files.readString(Path.of(actualPath));
+            ExprValue environment = pipeline.compile(envFile).eval(EvaluationSession.standard());
+            this.bindings = new PartiQLGlobalBindings(this.valueFactory).addBinding(environment.getBindings());
         } catch (IOException e) {
-            throw new RuntimeException("Could not load environment");
+            throw new SQLException("Could not load environment file.");
         }
-        ExprValue environment = pipeline.compile(envFile).eval(EvaluationSession.standard());
-        bindings = new PartiQLGlobalBindings(valueFactory).addBinding(environment.getBindings());
     }
 
     @Override
     public Statement createStatement() throws SQLException {
-        logger.info("Connection:createStatement()");
-        return new PartiQLStatement(this, bindings);
+        return new PartiQLStatement(this, this.bindings);
     }
 
     @Override
     public PreparedStatement prepareStatement(String s) throws SQLException {
-        logger.info("Connection:prepareStatement()");
-        return new PartiQLPreparedStatement(this, s);
+        throw new SQLFeatureNotSupportedException("Connection.prepareStatement(String) is not supported yet.");
     }
 
     @Override
     public void close() throws SQLException {
-
+        throw new SQLFeatureNotSupportedException("Connection.close() is not supported yet.");
     }
 
     @Override
@@ -65,26 +65,11 @@ public class PartiQLConnection extends AbstractConnection {
 
     @Override
     public void setReadOnly(boolean b) throws SQLException {
-        throw new UnsupportedOperationException("Method not supported: Connection.setReadOnly(boolean)");
+        throw new SQLFeatureNotSupportedException("Connection.setReadOnly(boolean) is not supported yet.");
     }
 
     @Override
     public boolean isReadOnly() throws SQLException {
         return true;
-    }
-
-    @Override
-    public Statement createStatement(int i, int i1) throws SQLException {
-        return new PartiQLStatement(this, bindings);
-    }
-
-    @Override
-    public void setSchema(String s) throws SQLException {
-
-    }
-
-    @Override
-    public String getSchema() throws SQLException {
-        return null;
     }
 }

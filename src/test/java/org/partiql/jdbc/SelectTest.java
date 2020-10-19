@@ -30,8 +30,13 @@ public class SelectTest {
         if (connection == null) {
             return;
         }
-        connection.close();
+        // connection.close();
     }
+
+    /*
+        These are all examples from the PartiQL CLI that I've brought in.
+        Currently there's no checking to see whether or not the result is valid.. but that's coming soon (TM)
+    */
 
     @Test
     public void testQ1() throws Exception {
@@ -42,9 +47,7 @@ public class SelectTest {
                 "FROM hr.employees e\n" +
                 "WHERE e.title = 'Dev Mgr'\n";
         ResultSet results = statement.executeQuery(query);
-        while (results.next()) {
-
-        }
+        logger.info(results.toString());
     }
 
     @Test
@@ -56,9 +59,11 @@ public class SelectTest {
                 "     e.projects AS p\n" +
                 "WHERE p.name LIKE '%security%'";
         ResultSet results = statement.executeQuery(query);
-        while (results.next()) {
+        logger.info(results.toString());
+    }
 
-        }
+    @Test
+    public void testQ3() throws Exception {
 
     }
 }
