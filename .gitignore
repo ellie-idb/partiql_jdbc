@@ -1,8 +1,6 @@
 # Project exclude paths
 /target/
 
-
-
 # Created by https://www.toptal.com/developers/gitignore/api/vim,git,java,emacs,kotlin,gradle,eclipse,intellij+all
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim,git,java,emacs,kotlin,gradle,eclipse,intellij+all
 
@@ -305,4 +303,3 @@ gradle-app.setting
 **/build/
 
 # End of https://www.toptal.com/developers/gitignore/api/vim,git,java,emacs,kotlin,gradle,eclipse,intellij+all
-
