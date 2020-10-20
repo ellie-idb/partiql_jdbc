@@ -31,6 +31,15 @@ public class PartiQLDataModel {
         return false;
     }
 
+    private static boolean matchesKeyAndTypeInStruct(IonStruct struct, String key, IonType type) {
+        if (struct.containsKey(key)) {
+            IonValue val = struct.get(key);
+            if (val.getType() == type) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public static boolean getBool(ExprValue node) throws IllegalArgumentException {
         if (matchesType(node, IonType.BOOL)) {
@@ -46,17 +55,6 @@ public class PartiQLDataModel {
         }
 
         throw new IllegalArgumentException("ExprValue did not match IonType.STRING");
-    }
-
-
-    private static boolean matchesKeyAndTypeInStruct(IonStruct struct, String key, IonType type) {
-        if (struct.containsKey(key)) {
-            IonValue val = struct.get(key);
-            if (val.getType() == type) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public static boolean getBoolFromStruct(ExprValue node, String name) throws IllegalArgumentException {
