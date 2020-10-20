@@ -8,10 +8,8 @@ import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.Iterator;
-import java.util.logging.Logger;
 
 public class PartiQLResultSet extends AbstractResultSet {
-    final private Logger logger = Logger.getLogger("org.partiql.jdbc");
     // Statement which generated this result set
     private PartiQLStatement statement;
     // The root value (maintained *just* in case)
@@ -19,12 +17,6 @@ public class PartiQLResultSet extends AbstractResultSet {
     // Our current node that we hit through the iterator
     private ExprValue current;
     private Iterator<ExprValue> iterator;
-
-    // Can we coerce the value within the ExprValue to e.g. integer? If not, throw an exception
-
-
-
-
 
     /**
      * Create a ResultSet given a statement and a root Expression Value returned from
@@ -38,7 +30,6 @@ public class PartiQLResultSet extends AbstractResultSet {
         this.root = value;
         this.iterator = this.root.iterator();
         this.current = this.iterator.next(); // Skip over the initial Bag element
-        logger.info(value.getType().name());
     }
 
     @Override
@@ -50,7 +41,6 @@ public class PartiQLResultSet extends AbstractResultSet {
     public boolean next() throws SQLException {
         if (this.iterator.hasNext()) {
             this.current = this.iterator.next();
-            logger.info(this.current.getType().name());
             return true;
         }
         return false;
@@ -64,12 +54,12 @@ public class PartiQLResultSet extends AbstractResultSet {
 
     @Override
     public int getInt(String s) throws SQLException {
-       return PartiQLDataModel.getInt(this.current, s);
+       return PartiQLDataModel.getIntFromStruct(this.current, s);
     }
 
     @Override
     public boolean getBoolean(String s) throws SQLException {
-        return PartiQLDataModel.getBool(this.current, s);
+        return PartiQLDataModel.getBoolFromStruct(this.current, s);
     }
 
     @Override
@@ -79,7 +69,7 @@ public class PartiQLResultSet extends AbstractResultSet {
 
     @Override
     public String getString(String s) throws SQLException {
-        return PartiQLDataModel.getString(this.current, s);
+        return PartiQLDataModel.getStringFromStruct(this.current, s);
     }
 
     @Override

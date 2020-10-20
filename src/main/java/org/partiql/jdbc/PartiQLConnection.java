@@ -31,13 +31,15 @@ public class PartiQLConnection extends AbstractConnection {
      */
     protected PartiQLConnection(String path) throws SQLException {
         this.ion = IonSystemBuilder.standard().build();
-        this.pipeline = CompilerPipeline.standard(ion);
-        this.valueFactory = ExprValueFactory.standard(ion);
+        this.valueFactory = ExprValueFactory.standard(this.ion);
+        this.pipeline = CompilerPipeline.builder(this.valueFactory)
+                                        .addFunction(new PartiQLS3Factory(this.valueFactory))
+                                        .build();
         // jdbc:partiql:(file path) is what this receives, so strip out everything before that isn't important
         String actualPath = path.substring(path.lastIndexOf(":") + 1);
         try {
             String envFile = Files.readString(Path.of(actualPath));
-            ExprValue environment = pipeline.compile(envFile).eval(EvaluationSession.standard());
+            ExprValue environment = this.pipeline.compile(envFile).eval(EvaluationSession.standard());
             this.bindings = new PartiQLGlobalBindings(this.valueFactory).addBinding(environment.getBindings());
         } catch (IOException e) {
             throw new SQLException("Could not load environment file.");
@@ -46,7 +48,7 @@ public class PartiQLConnection extends AbstractConnection {
 
     @Override
     public Statement createStatement() throws SQLException {
-        return new PartiQLStatement(this, this.bindings);
+        return new PartiQLStatement(this, this.pipeline, this.bindings);
     }
 
     @Override

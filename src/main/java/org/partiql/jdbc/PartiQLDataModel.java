@@ -3,8 +3,6 @@ package org.partiql.jdbc;
 import com.amazon.ion.*;
 import org.partiql.lang.eval.ExprValue;
 
-import java.sql.SQLException;
-
 public class PartiQLDataModel {
     /*
     TODO:
@@ -25,7 +23,33 @@ public class PartiQLDataModel {
     }
     */
 
-    private static boolean matchesKeyAndType(IonStruct struct, String key, IonType type) {
+    private static boolean matchesType(ExprValue node, IonType type) {
+        IonValue val = node.getIonValue();
+        if (val.getType() == type) {
+            return true;
+        }
+        return false;
+    }
+
+
+    public static boolean getBool(ExprValue node) throws IllegalArgumentException {
+        if (matchesType(node, IonType.BOOL)) {
+            return ((IonBool) node.getIonValue()).booleanValue();
+        }
+
+        throw new IllegalArgumentException("ExprValue did not match IonType.BOOL");
+    }
+
+    public static String getString(ExprValue node) throws IllegalArgumentException {
+        if (matchesType(node, IonType.STRING)) {
+            return ((IonString) node.getIonValue()).stringValue();
+        }
+
+        throw new IllegalArgumentException("ExprValue did not match IonType.STRING");
+    }
+
+
+    private static boolean matchesKeyAndTypeInStruct(IonStruct struct, String key, IonType type) {
         if (struct.containsKey(key)) {
             IonValue val = struct.get(key);
             if (val.getType() == type) {
@@ -35,12 +59,12 @@ public class PartiQLDataModel {
         return false;
     }
 
-    public static boolean getBool(ExprValue node, String name) throws SQLException {
+    public static boolean getBoolFromStruct(ExprValue node, String name) throws IllegalArgumentException {
         IonStruct struct = getStruct(node);
-        if (matchesKeyAndType(struct, name, IonType.BOOL)) {
+        if (matchesKeyAndTypeInStruct(struct, name, IonType.BOOL)) {
             return ((IonBool) struct.get(name)).booleanValue();
         }
-        throw new SQLException("Value did not match IonBool?");
+        throw new IllegalArgumentException("Value did not match IonBool?");
     }
 
     /**
@@ -49,16 +73,16 @@ public class PartiQLDataModel {
      * @param node The abstract ExprValue node to extract the value from
      * @param name The name representing the key within the IonStruct.
      * @return An integer representing the value extracted from the ExprValue.
-     * @throws SQLException
+     * @throws IllegalArgumentException
      */
 
-    public static int getInt(ExprValue node, String name) throws SQLException {
+    public static int getIntFromStruct(ExprValue node, String name) throws IllegalArgumentException {
         IonStruct struct = getStruct(node);
-        if (matchesKeyAndType(struct, name, IonType.INT)) {
+        if (matchesKeyAndTypeInStruct(struct, name, IonType.INT)) {
             return ((IonInt) struct.get(name)).intValue();
         }
 
-        throw new SQLException("Value did not match IonType.INT");
+        throw new IllegalArgumentException("Value did not match IonType.INT");
     }
 
     /**
@@ -66,31 +90,31 @@ public class PartiQLDataModel {
      *
      * @param node The abstract ExprValue node to extract the value from
      * @return An float representing the value extracted from the ExprValue.
-     * @throws SQLException
+     * @throws IllegalArgumentException
      */
-    public static float getFloat(ExprValue node) throws SQLException {
+    public static float getFloatFromStruct(ExprValue node) throws IllegalArgumentException {
         if (node.getIonValue() instanceof IonFloat) {
             return ((IonFloat) node.getIonValue()).floatValue();
         } else {
-            throw new SQLException("ionValue did not equal IonFloat?");
+            throw new IllegalArgumentException("ionValue did not equal IonFloat?");
         }
     }
 
-    public static String getString(ExprValue node, String name) throws SQLException {
+    public static String getStringFromStruct(ExprValue node, String name) throws IllegalArgumentException {
         IonStruct struct = getStruct(node);
-        if (matchesKeyAndType(struct, name, IonType.STRING)) {
+        if (matchesKeyAndTypeInStruct(struct, name, IonType.STRING)) {
             return ((IonString) struct.get(name)).stringValue();
         }
 
-        throw new SQLException("ionValue did not equal IonString?");
+        throw new IllegalArgumentException("ionValue did not equal IonString?");
     }
 
-    public static IonStruct getStruct(ExprValue node) throws SQLException {
+    public static IonStruct getStruct(ExprValue node) throws IllegalArgumentException {
         if (node.getIonValue() instanceof IonStruct) {
             return ((IonStruct) node.getIonValue());
         }
         else {
-            throw new SQLException("ionValue did not equal IonStruct?");
+            throw new IllegalArgumentException("ionValue did not equal IonStruct?");
         }
     }
 

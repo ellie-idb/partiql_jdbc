@@ -25,9 +25,9 @@ public class PartiQLStatement extends AbstractStatement {
      * @param connection The PartiQL connection to use
      * @param bindings The global environment which every query will refer to
      */
-    protected PartiQLStatement(PartiQLConnection connection, PartiQLGlobalBindings bindings) {
+    protected PartiQLStatement(PartiQLConnection connection, CompilerPipeline pipeline, PartiQLGlobalBindings bindings) {
         this.connection = connection;
-        this.pipeline = CompilerPipeline.standard(this.connection.ion);
+        this.pipeline = pipeline;
         this.bindings = bindings;
         this.session = EvaluationSession.builder().globals(this.bindings.asExprValue().getBindings()).build();
     }

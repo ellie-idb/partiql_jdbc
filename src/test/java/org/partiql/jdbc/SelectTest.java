@@ -78,6 +78,26 @@ public class SelectTest {
 
     @Test
     public void testQ3() throws Exception {
+        PartiQLStatement statement = (PartiQLStatement) connection.createStatement();
+        String query = "SELECT e.id AS id, \n" +
+                "       e.name AS employeeName, \n" +
+                "       e.title AS title, \n" +
+                "       p.name AS projectName\n" +
+                "FROM hr.employeesNest AS e LEFT JOIN e.projects AS p";
+        // Q3 is broken (LEFT JOIN e.projects as P ON ???)
+        // ResultSet results = statement.executeQuery(query);
+        // logger.info(results.toString());
+    }
 
+    @Test
+    public void testS3() throws Exception {
+        PartiQLStatement statement = (PartiQLStatement) connection.createStatement();
+        String query = "SELECT doc.name, doc.address \n" +
+                "FROM s3_link('partiql-test', 'env.ion') AS doc WHERE doc.age < 30";
+        ResultSet results = statement.executeQuery(query);
+
+        assertEquals("person_2", results.getString("name"));
+        results.next();
+        assertEquals("person_3", results.getString("name"));
     }
 }
