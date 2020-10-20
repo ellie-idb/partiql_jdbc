@@ -1,2 +1,7 @@
 # Project exclude paths
 /target/
+
+.gradle
+**/build/
+!src/**/build/
+.idea/*
