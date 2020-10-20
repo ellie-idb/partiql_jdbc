@@ -21,7 +21,7 @@ public class PartiQLGlobalBindings {
 
     PartiQLGlobalBindings addBinding(Bindings<ExprValue> bindings) {
         if (bindings instanceof MapBindings) {
-            knownNames.addAll(((MapBindings<ExprValue>) bindings).getOriginalCaseMap().keySet());
+            this.knownNames.addAll(((MapBindings<ExprValue>) bindings).getOriginalCaseMap().keySet());
             this.bindings = BindingsExtensionsKt.delegate(bindings, this.bindings);
         } else {
             // nothing to do
@@ -30,9 +30,9 @@ public class PartiQLGlobalBindings {
     }
 
     ExprValue asExprValue() {
-        Stream<ExprValue> values = knownNames.stream()
-                                             .map(value -> bindings.get(new BindingName(value, BindingCase.SENSITIVE)))
+        Stream<ExprValue> values = this.knownNames.stream()
+                                             .map(value -> this.bindings.get(new BindingName(value, BindingCase.SENSITIVE)))
                                              .filter(Objects::nonNull);
-        return valueFactory.newStruct(values.collect(Collectors.toList()), StructOrdering.ORDERED);
+        return this.valueFactory.newStruct(values.collect(Collectors.toList()), StructOrdering.ORDERED);
     }
 }

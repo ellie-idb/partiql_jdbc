@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.*;
+
 public class SelectTest {
     private Connection connection;
     final private Logger logger = Logger.getLogger("org.partiql.jdbc");
@@ -47,7 +49,9 @@ public class SelectTest {
                 "FROM hr.employees e\n" +
                 "WHERE e.title = 'Dev Mgr'\n";
         ResultSet results = statement.executeQuery(query);
-        logger.info(results.toString());
+        assertEquals("Susan Smith", results.getString("employeeName"));
+        assertEquals("Dev Mgr", results.getString("title"));
+        assertEquals(4, results.getInt("id"));
     }
 
     @Test
@@ -59,7 +63,17 @@ public class SelectTest {
                 "     e.projects AS p\n" +
                 "WHERE p.name LIKE '%security%'";
         ResultSet results = statement.executeQuery(query);
-        logger.info(results.toString());
+
+        assertEquals("Bob Smith", results.getString("employeeName"));
+        assertEquals("AWS Redshift security", results.getString("projectName"));
+        results.next();
+        assertEquals("Bob Smith", results.getString("employeeName"));
+        assertEquals("AWS Aurora security", results.getString("projectName"));
+        results.next();
+        assertEquals("Jane Smith", results.getString("employeeName"));
+        assertEquals("AWS Redshift security", results.getString("projectName"));
+        assertFalse(results.next());
+        assertTrue(results.isLast());
     }
 
     @Test

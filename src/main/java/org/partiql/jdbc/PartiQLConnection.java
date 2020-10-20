@@ -33,6 +33,7 @@ public class PartiQLConnection extends AbstractConnection {
         this.ion = IonSystemBuilder.standard().build();
         this.pipeline = CompilerPipeline.standard(ion);
         this.valueFactory = ExprValueFactory.standard(ion);
+        // jdbc:partiql:(file path) is what this receives, so strip out everything before that isn't important
         String actualPath = path.substring(path.lastIndexOf(":") + 1);
         try {
             String envFile = Files.readString(Path.of(actualPath));

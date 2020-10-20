@@ -5,6 +5,7 @@ import org.partiql.lang.util.ConfigurableExprValueFormatter;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Statement;
 import java.util.Iterator;
 import java.util.logging.Logger;
@@ -19,6 +20,12 @@ public class PartiQLResultSet extends AbstractResultSet {
     private ExprValue current;
     private Iterator<ExprValue> iterator;
 
+    // Can we coerce the value within the ExprValue to e.g. integer? If not, throw an exception
+
+
+
+
+
     /**
      * Create a ResultSet given a statement and a root Expression Value returned from
      * evaluating a PartiQL query.
@@ -29,8 +36,8 @@ public class PartiQLResultSet extends AbstractResultSet {
     protected PartiQLResultSet(PartiQLStatement statement, ExprValue value) {
         this.statement = statement;
         this.root = value;
-        this.iterator = root.iterator();
-        this.current = value;
+        this.iterator = this.root.iterator();
+        this.current = this.iterator.next(); // Skip over the initial Bag element
         logger.info(value.getType().name());
     }
 
@@ -41,9 +48,9 @@ public class PartiQLResultSet extends AbstractResultSet {
 
     @Override
     public boolean next() throws SQLException {
-        if (iterator.hasNext()) {
-            this.current = iterator.next();
-            logger.info(current.getType().name());
+        if (this.iterator.hasNext()) {
+            this.current = this.iterator.next();
+            logger.info(this.current.getType().name());
             return true;
         }
         return false;
@@ -56,12 +63,37 @@ public class PartiQLResultSet extends AbstractResultSet {
     }
 
     @Override
+    public int getInt(String s) throws SQLException {
+       return PartiQLDataModel.getInt(this.current, s);
+    }
+
+    @Override
+    public boolean getBoolean(String s) throws SQLException {
+        return PartiQLDataModel.getBool(this.current, s);
+    }
+
+    @Override
+    public Object getObject(String s) throws SQLException {
+        return PartiQLDataModel.getStruct(this.current);
+    }
+
+    @Override
+    public String getString(String s) throws SQLException {
+        return PartiQLDataModel.getString(this.current, s);
+    }
+
+    @Override
     public Statement getStatement() throws SQLException {
-        return statement;
+        return this.statement;
     }
 
     @Override
     public boolean isLast() throws SQLException {
-        return iterator.hasNext() == false;
+        return !this.iterator.hasNext();
+    }
+
+    @Override
+    public boolean last() throws SQLException {
+        throw new SQLFeatureNotSupportedException("Unimplemented");
     }
 }
