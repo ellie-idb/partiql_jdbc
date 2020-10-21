@@ -30,7 +30,8 @@ public class S3Test {
     public void testS3() throws Exception {
 
     }
-
+    
+    @Test
     public void testS3Select() throws Exception {
         PartiQLStatement statement = (PartiQLStatement) connection.createStatement();
         String query = "SELECT doc.name, doc.address \n" +
