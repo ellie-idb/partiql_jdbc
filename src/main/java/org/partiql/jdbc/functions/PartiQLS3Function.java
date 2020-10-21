@@ -25,6 +25,7 @@ public class PartiQLS3Function extends PartiQLBaseFunction {
         super(factory);
         this.ion = this.factory.getIon();
         this.client = AmazonS3ClientBuilder.standard()
+                                           .withRegion("us-east-1")
                                            .build();
     }
 

@@ -28,6 +28,10 @@ public class S3Test {
 
     @Test
     public void testS3() throws Exception {
+
+    }
+
+    public void testS3Select() throws Exception {
         PartiQLStatement statement = (PartiQLStatement) connection.createStatement();
         String query = "SELECT doc.name, doc.address \n" +
                 "FROM s3_link('partiql-test', 'env.ion') AS doc WHERE doc.age < 30";

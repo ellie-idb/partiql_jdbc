@@ -1,0 +1,11 @@
+language: java
+jdk: openjdk11
+script: ./gradlew build
+
+jobs:
+  include:
+    stage: Code coverage
+    jdk: openjdk11
+    script: ./gradlew build jacocoTestReport
+    after_success:
+      - bash <(curl -s https://codecov.io/bash)
