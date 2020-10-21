@@ -1,0 +1,2 @@
+ignore:
+  - "src/main/java/org/partiql/jdbc/Abstract*.java"

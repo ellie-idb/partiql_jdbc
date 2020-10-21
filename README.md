@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.com/hatf0/partiql_jdbc.svg?branch=master)](https://travis-ci.com/hatf0/partiql_jdbc)
-[![codecov](https://codecov.io/gh/hatf0/partiql_jdbc/branch/master/graph/badge.svg?token=J1HOZKWAZY)](undefined)
+[![codecov](https://codecov.io/gh/hatf0/partiql_jdbc/branch/master/graph/badge.svg)](https://codecov.io/gh/hatf0/partiql_jdbc)
 
 # PartiQL JDBC Driver
 This is an experimental PartiQL JDBC Driver. 
