@@ -2,6 +2,10 @@ package org.partiql.jdbc;
 
 import com.amazon.ion.IonSystem;
 import com.amazon.ion.system.IonSystemBuilder;
+import org.codehaus.plexus.util.StringUtils;
+import org.partiql.jdbc.functions.PartiQLFileReaderFunction;
+import org.partiql.jdbc.functions.PartiQLFileWriterFunction;
+import org.partiql.jdbc.functions.PartiQLS3Function;
 import org.partiql.lang.CompilerPipeline;
 import org.partiql.lang.eval.EvaluationSession;
 import org.partiql.lang.eval.ExprValue;
@@ -25,24 +29,33 @@ public class PartiQLConnection extends AbstractConnection {
     final private PartiQLGlobalBindings bindings;
 
     /***
-     *  Create a new PartiQL connection given an initial environment file to work on.
+     *  Create a new PartiQL connection.
      *
      * @param path The file to load for initial ingest (as long as it is valid Ion data)
+     *             Specifying a file is optional.
      */
+
     protected PartiQLConnection(String path) throws SQLException {
         this.ion = IonSystemBuilder.standard().build();
         this.valueFactory = ExprValueFactory.standard(this.ion);
         this.pipeline = CompilerPipeline.builder(this.valueFactory)
-                                        .addFunction(new PartiQLS3Factory(this.valueFactory))
+                                        .addFunction(new PartiQLS3Function(this.valueFactory))
+                                        .addFunction(new PartiQLFileReaderFunction(this.valueFactory))
+                                        .addFunction(new PartiQLFileWriterFunction(this.valueFactory))
                                         .build();
         // jdbc:partiql:(file path) is what this receives, so strip out everything before that isn't important
-        String actualPath = path.substring(path.lastIndexOf(":") + 1);
-        try {
-            String envFile = Files.readString(Path.of(actualPath));
-            ExprValue environment = this.pipeline.compile(envFile).eval(EvaluationSession.standard());
-            this.bindings = new PartiQLGlobalBindings(this.valueFactory).addBinding(environment.getBindings());
-        } catch (IOException e) {
-            throw new SQLException("Could not load environment file.");
+
+        if (StringUtils.countMatches(path, ":") == 1) {
+            this.bindings = new PartiQLGlobalBindings(this.valueFactory);
+        } else {
+            String actualPath = path.substring(path.lastIndexOf(":") + 1);
+            try {
+                String envFile = Files.readString(Path.of(actualPath));
+                ExprValue environment = this.pipeline.compile(envFile).eval(EvaluationSession.standard());
+                this.bindings = new PartiQLGlobalBindings(this.valueFactory).addBinding(environment.getBindings());
+            } catch (IOException e) {
+                throw new SQLException("Could not load environment file.");
+            }
         }
     }
 

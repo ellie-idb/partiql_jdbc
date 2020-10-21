@@ -1,4 +1,4 @@
-package org.partiql.jdbc;
+package org.partiql.jdbc.functions;
 
 import com.amazon.ion.IonStruct;
 import com.amazon.ion.IonValue;

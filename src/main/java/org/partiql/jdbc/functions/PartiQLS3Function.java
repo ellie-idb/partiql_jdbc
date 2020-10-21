@@ -1,4 +1,4 @@
-package org.partiql.jdbc;
+package org.partiql.jdbc.functions;
 
 import com.amazon.ion.IonDatagram;
 import com.amazon.ion.IonReader;
@@ -10,21 +10,21 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import org.jetbrains.annotations.NotNull;
+import org.partiql.jdbc.functions.PartiQLBaseFunction;
+import org.partiql.jdbc.PartiQLDataModel;
 import org.partiql.lang.eval.Environment;
 import org.partiql.lang.eval.ExprValue;
 import org.partiql.lang.eval.ExprValueFactory;
 
 import java.util.List;
 
-public class PartiQLS3Factory extends PartiQLBaseFunction {
+public class PartiQLS3Function extends PartiQLBaseFunction {
     private AmazonS3 client;
-    private ExprValueFactory factory;
     private IonSystem ion;
 
-    public PartiQLS3Factory(ExprValueFactory factory) {
+    public PartiQLS3Function(ExprValueFactory factory) {
         super(factory);
-        this.factory = factory;
-        this.ion = factory.getIon();
+        this.ion = this.factory.getIon();
         this.client = AmazonS3ClientBuilder.standard()
                                            .build();
     }

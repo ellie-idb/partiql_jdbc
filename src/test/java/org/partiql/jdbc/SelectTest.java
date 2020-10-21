@@ -88,16 +88,4 @@ public class SelectTest {
         // ResultSet results = statement.executeQuery(query);
         // logger.info(results.toString());
     }
-
-    @Test
-    public void testS3() throws Exception {
-        PartiQLStatement statement = (PartiQLStatement) connection.createStatement();
-        String query = "SELECT doc.name, doc.address \n" +
-                "FROM s3_link('partiql-test', 'env.ion') AS doc WHERE doc.age < 30";
-        ResultSet results = statement.executeQuery(query);
-
-        assertEquals("person_2", results.getString("name"));
-        results.next();
-        assertEquals("person_3", results.getString("name"));
-    }
 }
