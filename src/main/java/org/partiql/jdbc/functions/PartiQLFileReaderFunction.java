@@ -4,21 +4,14 @@ import com.amazon.ion.IonDatagram;
 import com.amazon.ion.IonReader;
 import com.amazon.ion.IonStruct;
 import com.amazon.ion.system.IonReaderBuilder;
-import kotlin.sequences.Sequence;
 import org.jetbrains.annotations.NotNull;
-import org.partiql.jdbc.functions.PartiQLBaseFunction;
 import org.partiql.jdbc.PartiQLDataModel;
 import org.partiql.lang.eval.Environment;
 import org.partiql.lang.eval.ExprValue;
 import org.partiql.lang.eval.ExprValueFactory;
-import org.partiql.lang.util.IonValueExtensionsKt;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.BiFunction;
 
 public class PartiQLFileReaderFunction extends PartiQLBaseFunction {
     public PartiQLFileReaderFunction(ExprValueFactory factory) {

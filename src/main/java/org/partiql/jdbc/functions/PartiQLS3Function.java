@@ -10,7 +10,6 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import org.jetbrains.annotations.NotNull;
-import org.partiql.jdbc.functions.PartiQLBaseFunction;
 import org.partiql.jdbc.PartiQLDataModel;
 import org.partiql.lang.eval.Environment;
 import org.partiql.lang.eval.ExprValue;
